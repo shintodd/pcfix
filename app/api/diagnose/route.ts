@@ -240,6 +240,8 @@ interface SearchCorpusItem {
   severity: string;
   category_slug?: string;
   steps: any;
+  takeaway?: string;
+  specs?: string;
   haystack: string;
 }
 
@@ -280,8 +282,10 @@ function getSearchCorpus(): SearchCorpusItem[] {
           const normTitle = (c.title || "").toLowerCase();
           const normSummary = (c.summary || "").toLowerCase();
           const normSymptoms = (c.symptoms || []).join(" ").toLowerCase();
-          const specs = c.meta?.hardware_specs ? String(c.meta.hardware_specs).toLowerCase() : "";
-          const takeaway = c.meta?.key_tech_takeaway ? String(c.meta.key_tech_takeaway).toLowerCase() : "";
+          const rawSpecs = c.meta?.hardware_specs ? String(c.meta.hardware_specs) : "";
+          const rawTakeaway = c.meta?.key_tech_takeaway ? String(c.meta.key_tech_takeaway) : "";
+          const specs = rawSpecs.toLowerCase();
+          const takeaway = rawTakeaway.toLowerCase();
           const slugText = (c.slug || "").replace(/-/g, " ");
           const stepsText = c.fix_steps
             ? c.fix_steps.map((s: any) => `${s.title}: ${s.detail || s.instruction || ""}`)
@@ -294,6 +298,8 @@ function getSearchCorpus(): SearchCorpusItem[] {
             severity: c.severity,
             category_slug: c.category_slug,
             steps: stepsText,
+            takeaway: rawTakeaway || undefined,
+            specs: rawSpecs || undefined,
             haystack: `${normTitle} ${normSummary} ${normSymptoms} ${specs} ${takeaway} ${slugText}`,
           });
         }
@@ -538,6 +544,8 @@ export async function POST(req: NextRequest) {
       summary: string;
       severity: string;
       fix_steps: any;
+      takeaway?: string;
+      specs?: string;
       rank: number;
     }> = [];
 
@@ -639,7 +647,7 @@ export async function POST(req: NextRequest) {
           })
           .filter((res) => res.directMatches >= 1 && res.score >= 0.08)
           .sort((a, b) => b.score - a.score || b.directMatches - a.directMatches)
-          .slice(0, 2);
+          .slice(0, 3);
 
         if (scoredIssues.length > 0) {
           issueMatches = scoredIssues.map((res) => ({
@@ -648,6 +656,8 @@ export async function POST(req: NextRequest) {
             summary: res.item.summary,
             severity: res.item.severity,
             fix_steps: res.item.steps,
+            takeaway: res.item.takeaway,
+            specs: res.item.specs,
             rank: res.score,
           }));
         }
@@ -689,16 +699,21 @@ export async function POST(req: NextRequest) {
     if (hasGoodDbMatches) {
       referenceSection = "VERIFIED HARDWARE KNOWLEDGE BASE CONTEXT:\n";
       if (issueMatches.length > 0) {
-        issueMatches.slice(0, 2).forEach((item, idx) => {
+        issueMatches.slice(0, 3).forEach((item, idx) => {
           const stepsFormatted = Array.isArray(item.fix_steps)
             ? item.fix_steps
                 .slice(0, 5)
-                .map((s: any, sIdx: number) => `  ${sIdx + 1}. ${s.title}: ${s.detail}`)
+                .map((s: any, sIdx: number) => {
+                  if (typeof s === "string") return `  ${sIdx + 1}. ${s}`;
+                  return `  ${sIdx + 1}. ${s.title || "Step"}: ${s.detail || s.instruction || ""}`;
+                })
                 .join("\n")
             : typeof item.fix_steps === "string"
             ? item.fix_steps
             : "";
-          referenceSection += `\n[Verified Reference Guide ${idx + 1}: ${item.title}]\nRoot Cause: ${item.summary}\nTechnical Resolution Steps:\n${stepsFormatted}\n`;
+          const specsLine = item.specs ? `Hardware: ${item.specs}\n` : "";
+          const takeawayLine = item.takeaway ? `Bench Takeaway: ${item.takeaway}\n` : "";
+          referenceSection += `\n[Verified Reference Guide ${idx + 1}: ${item.title}]\n${specsLine}Root Cause: ${item.summary}\n${takeawayLine}Technical Resolution Steps:\n${stepsFormatted}\n`;
         });
       }
       if (errorCodeMatches.length > 0) {
@@ -712,27 +727,29 @@ export async function POST(req: NextRequest) {
     }
 
     const openingInstructionMs = isFollowUp
-      ? `- PERBUALAN BERSAMBUNG: JANGAN ulang salam ("Hai", "Helo"). Semak apa yang user dah buat dalam sejarah mesej. JANGAN cadang balik langkah yang user dah cuba atau dah gagal. Naik taraf terus ke punca teknikal lebih mendalam (cth: semak slot RAM satu-satu di slot A2/B2, reset CMOS bateri, troubleshoot driver guna DDU mod selamat, semak telemetry SMART disk, atau perintah repair Windows).`
-      : `- AYAT PEMBUKA: Terus nyatakan punca utama teknikal yang paling berkemungkinan dalam 1 baris yang tepat dan jelas. Sapaan mesra dibenarkan sekali sahaja di awal perbualan.`;
+      ? `- PERBUALAN BERSAMBUNG: JANGAN ulang salam ("Hai", "Helo"). Semak apa yang user dah buat dalam sejarah mesej. JANGAN cadang balik langkah yang user dah cuba atau dah gagal. Sahkan terus apa yang telah ditolak ("Faham, ini bermakna [X] bukan puncanya") dan naik taraf terus ke pencilan perkakasan Tier 2 atau Tier 3 (cth: uji 1 stick RAM di slot A2 ikut topologi daisy-chain, periksa litar pintas MOSFET VRM, reset bateri CMOS, kemas kini BIOS FlashBack, atau analisis telemetri SMART/Event Viewer).`
+      : `- AYAT PEMBUKA: Terus nyatakan punca utama teknikal perkakasan atau sistem yang paling berkemungkinan dalam 1 baris yang tepat dan jelas. Sapaan mesra dibenarkan sekali sahaja di awal perbualan.`;
 
     const openingInstructionEn = isFollowUp
-      ? `- CONVERSATION IN PROGRESS: NEVER repeat greetings ("Hey", "Hello"). Inspect the conversation history for what the user has ALREADY tried. NEVER suggest checks they already confirmed doing. Progress immediately to deeper diagnostic checks (e.g. single RAM stick isolation in slot A2/B2, CMOS clearing, safe mode DDU driver clean install, SMART telemetry, or Windows repair commands).`
+      ? `- CONVERSATION IN PROGRESS: NEVER repeat greetings ("Hey", "Hello"). Inspect the conversation history for what the user has ALREADY tried. NEVER suggest checks they already confirmed doing. Explicitly acknowledge what was ruled out ("Understood, that confirms [X] is not the cause") and progress immediately to Tier 2 or Tier 3 bench hardware isolation (e.g. single RAM stick isolation in slot A2 following daisy-chain topology, VRM MOSFET short detection, CMOS clearing, USB BIOS FlashBack, or SMART/Event Viewer telemetry).`
       : `- OPENING: State the most probable technical root cause clearly in 1 direct sentence. Greet only once at the start.`;
 
     const langInstruction =
       lang === "ms"
         ? `5. GAYA BAHASA & KUALITI JAWAPAN (PAKAR TEKNIKAL PC REALISTIK & TEPAT):
-   - NADA: Ramah, santai tapi sangat berpengetahuan macam technician PC berpengalaman. JANGAN bagi jawapan generik robotik atau berulang.
+   - NADA: Juruteknik meja baik pulih perkakasan PC berpengalaman. Berpengetahuan mendalam, tepat, tanpa leteran kosong dan tanpa jawapan templat robotik.
    ${openingInstructionMs}
-   - BAHASA: Bahasa Melayu santai harian Malaysia. Guna istilah perkakasan standard (motherboard, RAM, GPU, CPU, SSD, BIOS, Windows, kabel power, slot PCIe, pin front panel).
+   - BAHASA: Bahasa Melayu santai teknikal harian Malaysia. Guna istilah perkakasan standard (motherboard, RAM, GPU, CPU, SSD, BIOS, UEFI, CMOS, kabel power, slot PCIe, pin front panel, MOSFET, VRM).
    - FORMAT: Langkah bernombor (1., 2., 3.) dengan tajuk bold dan penerangan teknikal yang jelas dan boleh terus dibuat. Sertakan arahan CMD / PowerShell dalam format kod markdown jika perlu (cth: \`sfc /scannow\`, \`dism\`).
-   - PANJANG: Sederhana dan berinformasi tinggi (sekitar 180 hingga 300 patah perkataan). Elakkan leteran kosong, tapi pastikan panduan teknikal lengkap dan berguna.
+   - PANJANG: Sederhana dan berinformasi tinggi (sekitar 180 hingga 320 patah perkataan). Elakkan leteran kosong, tapi pastikan panduan teknikal lengkap dan berguna.
+   - SOALAN TRIAGE: Jika simptom masih kurang jelas, akhiri jawapan dengan 1 atau 2 soalan triage teknikal yang tepat untuk mengecilkan kemungkinan.
    - LUAR TOPIK: Tolak secara ringkas dan mesra dalam 1 baris: "Saya cuma pakar baiki PC dan laptop je bos. Ada apa-apa isu komputer yang nak saya bantu?"`
         : `5. LANGUAGE & RESPONSE QUALITY (EXPERT PC TECHNICIAN, ACTIONABLE & PRECISE):
-   - TONE: Professional, experienced PC hardware technician. Direct, knowledgeable, zero fluff, and zero generic robotic template speak.
+   - TONE: Senior bench hardware repair technician. Authoritative, highly technical, zero fluff, and zero generic robotic template speak.
    ${openingInstructionEn}
    - FORMAT: Clean numbered steps (1., 2., 3.) with bold action titles and concrete technical instructions. Provide exact CMD / PowerShell commands in markdown code blocks whenever relevant (e.g. \`sfc /scannow\`, \`DISM /Online /Cleanup-Image /RestoreHealth\`, \`chkdsk C: /f /r\`, \`bcdboot\`).
-   - LENGTH: High-density, balanced response (typically 180 to 300 words). Concise but thorough technical guidance.
+   - LENGTH: High-density, balanced response (typically 180 to 320 words). Concise but thorough technical guidance.
+   - TRIAGE QUESTIONS: If symptoms remain ambiguous, conclude with 1 or 2 targeted diagnostic triage questions to isolate the exact failing component.
    - OFF-TOPIC: Briefly and politely decline in 1 line: "I specialize strictly in PC and laptop repairs! Let me know if you have any computer issues to troubleshoot."`;
 
     const systemPrompt = `You are pcfix Technician Desk, an expert PC hardware and system diagnostic specialist. You diagnose and resolve computer hardware, Windows OS, networking, and component issues with high technical accuracy and zero fluff.
@@ -742,12 +759,30 @@ CRITICAL INSTRUCTIONS:
    You strictly diagnose and repair PC/laptop hardware, operating system, networking, and software problems.
    If asked about non-computing topics, politely decline in 1 short sentence: "I specialize strictly in PC and hardware repairs. Let me know what computer issue I can help you solve."
 
-2. MULTI-TURN CONTEXT & ANTI-REPETITION (CRITICAL):
+2. BENCH DIAGNOSTIC PROTOCOL & COMPONENT ISOLATION:
+   - Identify the exact physical, electrical, or software mechanism first:
+     * 0.5-second fan twitch then shutoff: Latching Over-Current (OCP) or Short-Circuit Protection (SCP) trip on the +12V rail, typically caused by a shorted high-side VRM MOSFET on the motherboard or GPU.
+     * Motherboard Debug LEDs:
+       - CPU LED (Red): 8-pin EPS 12V unseated, bent socket pins (LGA1700/AM5 or AM4 PGA pin pull), cooler uneven mounting pressure, outdated BIOS microcode.
+       - DRAM LED (Yellow/Orange): Daisy-chain memory topology requires testing slot A2 (2nd slot from CPU) with 1 stick first; AM5 platforms have up to 3-5 minute initial memory training delay with EXPO enabled.
+       - VGA LED (White): 12VHPWR sensor pins unseated, PCIe riser cable Gen3/Gen4 conflict, missing auxiliary PCIe power.
+       - BOOT LED (Green): UEFI bootloader missing, SATA/NVMe drive undetected, Intel VMD/RST hiding storage controller.
+     * Intel 13th & 14th Gen Raptor Lake Instability:
+       - Core i9-13900K/14900K or i7-13700K/14700K crashing in games with "Out of video memory" or shader decompression errors is caused by Vmin shift silicon degradation. Recommend updating motherboard BIOS to 0x12B microcode and enforcing Intel Default Settings profile.
+     * AMD Ryzen AM4/AM5 Quirks:
+       - AM4 PGA CPUs frequently suffer from bent pins on the outer rows after cooler removal due to thermal paste suction, cutting memory channel A or B.
+       - fTPM micro-stutters require BIOS update with AGESA 1.2.0.7 or later.
+     * Liquid Cooling AIO Airlocks:
+       - If CPU instantly throttles to 95C-100C but radiator tubes are cold and pump shows RPM, an air bubble is trapped in the pump impeller. Tilt the chassis 45 degrees while running to burp air into the radiator.
+     * Bench Breadboard Isolation:
+       - When a system fails to POST inside a case, test the bare motherboard on non-conductive cardboard, jump the PWR_SW front-panel pins with a flathead screwdriver to eliminate case power button shorts, and test with minimal components (CPU, 1 stick in A2, 24-pin + 8-pin EPS).
+
+3. MULTI-TURN CONTEXT & ANTI-REPETITION (CRITICAL):
    - Always analyze previous messages in the chat history.
    - NEVER repeat checks or advice the user already mentioned trying or confirmed didn't work.
-   - If basic checks (cables, power button, monitor input) failed, IMMEDIATELY escalate to Tier 2 (motherboard debug LEDs, CMOS battery reset, single RAM stick testing in slot A2/B2, BIOS UEFI CSM/Secure Boot settings) or Tier 3 (Safe Mode DDU driver wipe, Windows DISM/SFC image repair, SSD SMART telemetry, power supply 12V rail / transient drop testing).
+   - If basic checks (cables, power button, monitor input, RAM reseating) failed, IMMEDIATELY escalate to Tier 2 (motherboard debug LEDs, CMOS battery reset, single RAM stick testing in slot A2/B2, BIOS UEFI CSM/Secure Boot settings) or Tier 3 (Safe Mode DDU driver wipe, Windows DISM/SFC image repair, SSD SMART telemetry, power supply 12V rail / transient drop testing).
 
-3. TECHNICAL ACCURACY & EXACT COMMANDS:
+4. TECHNICAL ACCURACY & EXACT COMMANDS:
    - Provide concrete, copy-pasteable Windows CMD or PowerShell commands in markdown code blocks with exact flags:
      * System file check: \`sfc /scannow\`
      * Image health: \`DISM /Online /Cleanup-Image /RestoreHealth\`
@@ -757,7 +792,7 @@ CRITICAL INSTRUCTIONS:
      * EFI bootloader rebuild: \`bcdboot C:\\Windows /s S: /f UEFI\`
    - Explain technical concepts accurately: DDR4/DDR5 memory training, dual-channel A2/B2 slot population, PCIe gen link speeds, SSD DRAM cache vs HMB, VRM thermal limits, and Windows Event IDs (WHEA 18/19, Kernel-Power 41, Disk 7/51/153, Display TDR 4101).
 
-4. HARDWARE SCANNER TELEMETRY PARSING:
+5. HARDWARE SCANNER TELEMETRY PARSING:
    - If the user pastes text or a report from "pcfix Desktop Scanner" (or any hardware telemetry like DxDiag, HWiNFO, CrystalDiskInfo):
      * Immediately analyze the specific hardware lines: CPU temperature, RAM configuration (single vs dual channel, XMP/EXPO status, MT/s speed), Disk health (SMART wear %, reallocated sectors, EFI split-boot detection), and Windows Event Log entries.
      * Pinpoint the exact root cause directly from the numbers and logs provided.
@@ -768,7 +803,7 @@ CRITICAL INSTRUCTIONS:
        3. Paste: Click "Copy Report" and paste it here for instant root-cause analysis.
      * Mention it is 100% open source on GitHub, completely read-only, and safe.
 
-5. MULTIMODAL SCREENSHOT & PHOTO INSPECTION:
+6. MULTIMODAL SCREENSHOT & PHOTO INSPECTION:
    - When an image or screenshot is attached, inspect all visible details:
      * BSOD stop code text (e.g. 0x00000133, WHEA_UNCORRECTABLE_ERROR, CRITICAL_PROCESS_DIED).
      * Motherboard debug LED colors and labels (CPU, DRAM, VGA, BOOT).
@@ -777,12 +812,12 @@ CRITICAL INSTRUCTIONS:
      * BIOS / UEFI configuration screens.
    - State your visual findings in your opening sentence.
 
-6. PHYSICAL SAFETY & ZERO EM DASH RULE:
+7. PHYSICAL SAFETY & ZERO EM DASH RULE:
    - PHYSICAL SAFETY FIRST: Whenever advising a user to open a PC chassis or touch internal components (RAM, CMOS battery, GPU, cables), ALWAYS mandate in Step 1 to shut down the PC and unplug the AC power cord / charger first to prevent electrical damage or shock.
    - ZERO EM DASHES: Strictly NEVER use the em dash character. Use a standard hyphen (-) or colon (:) instead.
    - ZERO CIRCLE DOTS: Strictly NEVER use bullet circle characters. Use standard numbered lists (1., 2., 3.) or hyphens (-).
 
-7. IDENTITY & BRANDING:
+8. IDENTITY & BRANDING:
    - Your identity is strictly "pcfix Technician Desk".
    - Branding is strictly "pcfix".
    - NEVER mention Google, Gemini, OpenAI, ChatGPT, Anthropic, Claude, or LLM architectures. If asked what system you are, answer: "I am pcfix, your dedicated hardware and system repair diagnostic assistant."
@@ -798,7 +833,10 @@ ${referenceSection}`;
         const top = issueMatches[0];
         const stepsText = Array.isArray(top.fix_steps)
           ? top.fix_steps
-              .map((s: any, idx: number) => `${idx + 1}. **${s.title}**: ${s.detail}`)
+              .map((s: any, idx: number) => {
+                if (typeof s === "string") return `${idx + 1}. ${s}`;
+                return `${idx + 1}. **${s.title || "Step"}**: ${s.detail || s.instruction || ""}`;
+              })
               .join("\n\n")
           : typeof top.fix_steps === "string"
           ? top.fix_steps
@@ -872,10 +910,10 @@ ${referenceSection}`;
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const modelName = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 
-    // Keep last 8 messages to prevent prompt token bloat on long multi-turn sessions
-    const recentHistory = history.slice(-8);
+    // Keep last 10 messages for rich multi-turn diagnostic reasoning
+    const recentHistory = history.slice(-10);
 
     // Format chat history for Gemini contents including multimodal image data
     const contents = recentHistory.map((msg) => {
@@ -903,17 +941,17 @@ ${referenceSection}`;
 
     const config: any = {
       systemInstruction: systemPrompt,
+      thinkingConfig: {
+        thinkingBudget: 1024,
+      },
     };
-
-    // Google Search tool is only supported with text inputs
-    if (pathUsed === "live_search" && !hasImageInContents) {
-      config.tools = [{ googleSearch: {} }];
-    }
 
     const candidateModels = [
       modelName,
-      "gemini-2.5-flash",
+      "gemini-3.7-flash",
       "gemini-3.6-flash",
+      "gemini-3.5-flash",
+      "gemini-3.5-flash-lite",
     ].filter((v, i, a) => a.indexOf(v) === i);
 
     const wantsStream = req.nextUrl.searchParams.get("stream") === "true";
@@ -983,7 +1021,7 @@ ${referenceSection}`;
             break;
           }
         } catch (err: any) {
-          console.warn(`Stream attempt on ${targetModel} failed:`, err.message);
+          console.warn(`Stream attempt on ${targetModel} with thinking failed:`, err.message);
           if (
             err.message?.includes("429") ||
             err.message?.includes("RESOURCE_EXHAUSTED") ||
@@ -991,21 +1029,21 @@ ${referenceSection}`;
           ) {
             isRateLimited = true;
           }
-          if (config.tools) {
+          if (config.thinkingConfig) {
             try {
-              const noToolConfig = { ...config };
-              delete noToolConfig.tools;
+              const noThinkingConfig = { ...config };
+              delete noThinkingConfig.thinkingConfig;
               streamResponse = await ai.models.generateContentStream({
                 model: targetModel,
                 contents,
-                config: noToolConfig,
+                config: noThinkingConfig,
               });
               if (streamResponse) {
                 isRateLimited = false;
                 break;
               }
             } catch (retryErr: any) {
-              console.warn(`Retry without tools on ${targetModel} failed:`, retryErr.message);
+              console.warn(`Retry without thinking on ${targetModel} failed:`, retryErr.message);
               if (
                 retryErr.message?.includes("429") ||
                 retryErr.message?.includes("RESOURCE_EXHAUSTED") ||
@@ -1133,7 +1171,10 @@ ${referenceSection}`;
         const top = issueMatches[0];
         const stepsText = Array.isArray(top.fix_steps)
           ? top.fix_steps
-              .map((s: any, idx: number) => `${idx + 1}. **${s.title}**: ${s.detail}`)
+              .map((s: any, idx: number) => {
+                if (typeof s === "string") return `${idx + 1}. ${s}`;
+                return `${idx + 1}. **${s.title || "Step"}**: ${s.detail || s.instruction || ""}`;
+              })
               .join("\n\n")
           : typeof top.fix_steps === "string"
           ? top.fix_steps
@@ -1203,7 +1244,7 @@ ${referenceSection}`;
           break;
         }
       } catch (err: any) {
-        console.warn(`Attempt with ${targetModel} (tools: ${!!config.tools}) failed:`, err.message);
+        console.warn(`Attempt with ${targetModel} failed:`, err.message);
         if (
           err.message?.includes("429") ||
           err.message?.includes("RESOURCE_EXHAUSTED") ||
@@ -1211,14 +1252,14 @@ ${referenceSection}`;
         ) {
           isRateLimited = true;
         }
-        if (config.tools) {
+        if (config.thinkingConfig) {
           try {
-            const noToolConfig = { ...config };
-            delete noToolConfig.tools;
+            const noThinkingConfig = { ...config };
+            delete noThinkingConfig.thinkingConfig;
             const retryResponse = await ai.models.generateContent({
               model: targetModel,
               contents,
-              config: noToolConfig,
+              config: noThinkingConfig,
             });
             if (retryResponse.text) {
               isRateLimited = false;
@@ -1228,7 +1269,7 @@ ${referenceSection}`;
               break;
             }
           } catch (retryErr: any) {
-            console.warn(`Retry without tools on ${targetModel} failed:`, retryErr.message);
+            console.warn(`Retry without thinking on ${targetModel} failed:`, retryErr.message);
             if (
               retryErr.message?.includes("429") ||
               retryErr.message?.includes("RESOURCE_EXHAUSTED") ||
@@ -1246,7 +1287,10 @@ ${referenceSection}`;
         const top = issueMatches[0];
         const stepsText = Array.isArray(top.fix_steps)
           ? top.fix_steps
-              .map((s: any, idx: number) => `${idx + 1}. **${s.title}**: ${s.detail}`)
+              .map((s: any, idx: number) => {
+                if (typeof s === "string") return `${idx + 1}. ${s}`;
+                return `${idx + 1}. **${s.title || "Step"}**: ${s.detail || s.instruction || ""}`;
+              })
               .join("\n\n")
           : typeof top.fix_steps === "string"
           ? top.fix_steps
