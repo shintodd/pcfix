@@ -1,0 +1,1 @@
+this feature makes swapping your GPU so much easier. this is the PC IQ release feature from Asus which allows you to remove your GPU using a single push button rather than a typical latch on a Pcie slot. this is just another feature that I think all motherboard manufacturers should be implementing to make PC upgrading easier for consumers.

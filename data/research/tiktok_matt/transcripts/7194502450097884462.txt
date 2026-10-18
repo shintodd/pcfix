@@ -1,0 +1,1 @@
+so after removing the cup of dry ice off my CPU, it was so cold that I decided to see if we could boot into Windows without a cooler. so I didn't. after loading it up, the CPU was sitting around 60 degrees Celsius at idle and it didn't even start to climb for a few minutes after sitting.

@@ -252,6 +252,50 @@ async function main() {
   }
   console.log(`✅ Total issues seeded: ${totalIssues} (failures: ${issueFailures})`);
 
+  // 3b. Seed Curated Matt's Computer Services Bench Cases
+  const mattCuratedPath = path.join(researchDir, "tiktok_matt", "curated_pcfix_guides.json");
+  if (fs.existsSync(mattCuratedPath)) {
+    console.log("🛠️ Seeding Matt's Computer Services bench repair cases...");
+    try {
+      const mattCases = JSON.parse(fs.readFileSync(mattCuratedPath, "utf-8"));
+      let mattCount = 0;
+      for (const item of mattCases) {
+        try {
+          await prisma.issue.upsert({
+            where: { slug: item.slug },
+            update: {
+              title: item.title,
+              summary: item.summary,
+              severity: item.severity,
+              symptoms: item.symptoms,
+              fix_steps: item.fix_steps,
+              category_slug: item.category_slug,
+              source: "researched",
+              verified: true,
+            },
+            create: {
+              slug: item.slug,
+              title: item.title,
+              summary: item.summary,
+              severity: item.severity,
+              symptoms: item.symptoms,
+              fix_steps: item.fix_steps,
+              category_slug: item.category_slug,
+              source: "researched",
+              verified: true,
+            },
+          });
+          mattCount++;
+        } catch (err: any) {
+          // ignore single item collisions
+        }
+      }
+      console.log(`✅ Upserted ${mattCount} Matt's Computer Services bench cases.`);
+    } catch (err: any) {
+      console.warn("⚠️ Could not seed Matt's cases:", err.message);
+    }
+  }
+
   // 4. Seed Wizard Decision Tree Nodes
   const wizardFile = path.join(researchDir, "wizard_tree.json");
   if (fs.existsSync(wizardFile)) {

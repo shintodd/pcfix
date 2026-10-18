@@ -1,0 +1,1 @@
+This is my external GPU running over at M dot 2 to Pcie 60 next adapter and I got a ton of requests to test it using Fortnite, so I didn't. After running it at the 1080 p high preset with ray tracing on, I was getting around 60 to 70 frames per second the entire time with this RTX. What game should I try to bench park next with this setup? Let me know in the comments down below.

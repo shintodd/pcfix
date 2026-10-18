@@ -1,0 +1,1 @@
+You guys asked for it, so I made it happen. Running an external GPU on a laptop using MDOT 2 to pcie adapter. And I want to know what games do you think we should use for testing? Let me know in the comments down below.

@@ -1,0 +1,1 @@
+I recently installed a CPU cooler in a GPU, but I thought we could take it up a notch. so I installed a 12,000 RPM fan on it and by doing so I saw idle temperatures down to 28 degrees Celsius. in order to test this further, I ran this GPU stress test where we peaked only at 58 degrees Celsius. if you want to do this for yourself, you may want to purchase some headphones.

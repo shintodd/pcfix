@@ -15,6 +15,7 @@
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "test": "tsx scripts/run-qa-suite.ts",
+    "test:e2e": "tsx scripts/run-e2e-suite.ts",
     "test:mobile": "tsx scripts/test-mobile-ux.ts",
     "test:pentest": "tsx scripts/pentagi-security-audit.ts",
     "test:mcp": "tsx scripts/test-mcp-server.ts",

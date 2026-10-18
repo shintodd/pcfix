@@ -1,0 +1,1 @@
+This device from Silverstone allows you to remote start your PC like a car. To get it set up, all you have to do is install the included PC IE card in your system and plug in the power and reset wires to your front panel connectors. Once that's complete, you can use the included remote to start up, shut down and restart your PC.

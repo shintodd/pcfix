@@ -1,0 +1,1 @@
+HP's M dot 2 slot was definitely an afterthought as it's not straight, and I'm pretty sure it was a last minute add on where some executive told the engineering team that we can't change the design of the system or the size of the PCB itself, but find a way to go ahead and make it work.

@@ -1,0 +1,1 @@
+so after removing the cup of dry ice off my CPU, the system was so cold that I decided to try to turn it on without a cooler. and after loading left into the BIOS, the CPU is reporting a temperature at negative 1 degrees Celsius.

@@ -1,0 +1,1 @@
+this is an i74790k codenamed devils Canyon, released back in 2014. this was intel's first CPU to reach a base clock of 4 gigahertz. it had 4 cores and 8 threads, and at the time this was the top of the line processor for gaming. do you think this processor can still hold up today? let me know in the comments down below.

@@ -269,6 +269,38 @@ function getSearchCorpus(): SearchCorpusItem[] {
         haystack: `${normalizedTitle} ${normalizedSummary} ${normalizedSymptoms} ${slugText} ${compactSlug} ${categoryText}`,
       };
     });
+
+    try {
+      const fs = require("fs");
+      const path = require("path");
+      const mattCasesPath = path.join(process.cwd(), "data", "research", "tiktok_matt", "curated_pcfix_guides.json");
+      if (fs.existsSync(mattCasesPath)) {
+        const mattCases = JSON.parse(fs.readFileSync(mattCasesPath, "utf-8"));
+        for (const c of mattCases) {
+          const normTitle = (c.title || "").toLowerCase();
+          const normSummary = (c.summary || "").toLowerCase();
+          const normSymptoms = (c.symptoms || []).join(" ").toLowerCase();
+          const specs = c.meta?.hardware_specs ? String(c.meta.hardware_specs).toLowerCase() : "";
+          const takeaway = c.meta?.key_tech_takeaway ? String(c.meta.key_tech_takeaway).toLowerCase() : "";
+          const slugText = (c.slug || "").replace(/-/g, " ");
+          const stepsText = c.fix_steps
+            ? c.fix_steps.map((s: any) => `${s.title}: ${s.detail || s.instruction || ""}`)
+            : [];
+
+          cachedSearchCorpus.push({
+            slug: c.slug,
+            title: c.title,
+            summary: c.summary,
+            severity: c.severity,
+            category_slug: c.category_slug,
+            steps: stepsText,
+            haystack: `${normTitle} ${normSummary} ${normSymptoms} ${specs} ${takeaway} ${slugText}`,
+          });
+        }
+      }
+    } catch {
+      // Fallback cleanly if file is unreadable
+    }
   }
   return cachedSearchCorpus;
 }

@@ -1,0 +1,1 @@
+Dental stock cooler wasn't cutting it, so I thought it was time for a little bit of a modification. So I cut off the stock fan and took a 6,000 RPM industrial fan that stuck it on top of my heat sink. By doing this, I was actually able to drop the CPU temperature under a stress test by 7 degrees Celsius. However, this came at the expense of my ears.

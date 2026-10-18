@@ -1,0 +1,26 @@
+[
+  {
+    "id": "7697718543181221151",
+    "title": "Gaming PC Won’t Wake Up! #techtok #techtips #repair #gamingpc #pcbuild",
+    "url": "https://www.tiktok.com/@mattscomputerservices/video/7697718543181221151",
+    "analysis": {
+      "problem_symptom": "The gaming PC would not turn on using the power button after being shut down. It required a hard power reset (flipping the power supply switch off, holding the power button for 10 seconds, then flipping the power supply switch back on and pressing the power button) to start. Additionally, the GPU was running at one-fourth of its intended speed.",
+      "hardware_specs": {
+        "gpu": "Gigabyte 2060",
+        "motherboard": "ASUS ROG Strix Z790-A Gaming WiFi",
+        "cooler": "AIO (All-in-One Liquid Cooler)",
+        "ram": "RGB RAM",
+        "psu": "Corsair Power Supply",
+        "case": "White PC case with multiple fans"
+      },
+      "diagnostic_steps": [
+        "Performed a hard power reset (flipping PSU switch off, holding power button for 10s, then flipping PSU switch on and pressing power button) to confirm it would power on.",
+        "Used a Thermaltake Dr. Power III power supply tester to verify the power supply was functioning correctly.",
+        "Observed a blinking LED indicator for the BIOS flashback button on the motherboard's rear I/O panel."
+      ],
+      "root_cause": "The primary issue was a known defect in certain ASUS motherboards where the BIOS flashback feature gets stuck in a constant loop, continuously looking for a USB flash drive to flash the BIOS. This security feature prevents the PC from powering on normally. The secondary issue was the GPU being installed in a PCIe x4 slot instead of the primary PCIe x16 slot, bottlenecking its performance to one-fourth of its potential speed.",
+      "final_solution": "For the power-on issue, the BIOS flashback feature was temporarily disabled in the UEFI BIOS settings by navigating to Advanced Mode > Advanced > APM Configuration > ErP Ready and enabling 'S4+S5'. This restricts power to features like BIOS flashback during shutdown states. For the GPU performance issue, the GPU was moved from the secondary PCIe x4 slot to the primary PCIe x16 slot.",
+      "key_tech_takeaway": "BIOS flashback is a useful feature for motherboard updates, but certain ASUS motherboards can have a defect where the feature gets stuck, preventing normal power-on. Disabling ErP Ready (S4+S5) in the BIOS can temporarily resolve this by cutting power to the problematic feature. Always ensure the GPU is installed in the primary PCIe x16 slot for optimal performance, as secondary slots may have fewer lanes (e.g., x4) and cause significant bottlenecks."
+    }
+  }
+]
