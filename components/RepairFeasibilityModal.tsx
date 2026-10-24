@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calculator, CheckCircle2, AlertCircle, HelpCircle, DollarSign, Clock, ShieldCheck } from "lucide-react";
+import { X, Calculator, CheckCircle2, AlertCircle, HelpCircle, DollarSign, Clock, ShieldCheck } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function RepairFeasibilityModal({

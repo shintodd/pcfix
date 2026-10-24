@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Video } from "lucide-react";
+import { X, Video } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const InteractiveDiagnosticPlayer = dynamic(

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Terminal, Wrench, ChevronRight, ShieldCheck } from "lucide-react";
+import { Terminal, Wrench, ChevronRight, ShieldCheck } from "@/components/icons";
 import QuickTipsFeed from "@/components/QuickTipsFeed";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { TIPS_DATA } from "@/lib/tips-data";

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Cpu, Search, AlertOctagon, CheckCircle2, ShieldAlert, ChevronRight, ExternalLink } from "lucide-react";
+import { X, Cpu, Search, AlertOctagon, CheckCircle2, ShieldAlert, ChevronRight, ExternalLink } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import defectsData from "@/data/research/silicon_defects.json";
 

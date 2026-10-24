@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Terminal, Copy, Check, ShieldAlert, CheckCircle2, ChevronRight, Info } from "lucide-react";
+import { X, Terminal, Copy, Check, ShieldAlert, CheckCircle2, ChevronRight, Info } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface DiagnosticCommand {

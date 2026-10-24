@@ -29,7 +29,7 @@ import {
   ChevronDown,
   Cpu,
   Download,
-} from "lucide-react";
+} from "@/components/icons";
 import { CATEGORIES } from "@/lib/categories";
 import {
   diagnoseProblem as mockDiagnose,

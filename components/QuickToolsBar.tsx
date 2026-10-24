@@ -13,7 +13,7 @@ import {
   Activity,
   Cpu,
   Video,
-} from "lucide-react";
+} from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { LiquidGlassCard } from "@/components/LiquidGlassCard";
 

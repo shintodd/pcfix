@@ -22,7 +22,7 @@ import {
   CheckCircle2,
   Clock,
   X,
-} from "lucide-react";
+} from "@/components/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { type CategoryInfo, type Severity } from "@/lib/categories";
 import { type IssueDetail } from "@/lib/mock-data";

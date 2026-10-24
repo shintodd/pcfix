@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ZoomIn, X, Eye, CheckCircle2, ShieldCheck, Camera } from "lucide-react";
+import { ZoomIn, X, Eye, CheckCircle2, ShieldCheck, Camera } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface HardwarePhotoGuide {

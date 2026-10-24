@@ -15,7 +15,7 @@ import {
   Play,
   RotateCcw,
   CheckCircle2,
-} from "lucide-react";
+} from "@/components/icons";
 
 const PRESET_DIAGNOSTICS: Record<string, DiagnosticVideoProps> = {
   dram: {

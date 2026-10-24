@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Globe } from "lucide-react";
+import { Globe } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function LanguageToggle({ className = "" }: { className?: string }) {

@@ -19,7 +19,7 @@ import {
   Monitor,
   ThumbsUp,
   RotateCcw,
-} from "lucide-react";
+} from "@/components/icons";
 import { type IssueDetail, type Severity } from "@/lib/mock-data";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";

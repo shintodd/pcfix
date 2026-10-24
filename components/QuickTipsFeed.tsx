@@ -14,7 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
-} from "lucide-react";
+} from "@/components/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { TIPS_DATA, TIPS_CATEGORIES, type TipCategory, type TipItem } from "@/lib/tips-data";

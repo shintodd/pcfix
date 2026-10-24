@@ -14,7 +14,7 @@ import {
   Wrench,
   AlertTriangle,
   Zap,
-} from "lucide-react";
+} from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { TranslationKey } from "@/lib/i18n/translations";
 import MovingIcon, { type MovingIconAnimation } from "@/components/MovingIcon";

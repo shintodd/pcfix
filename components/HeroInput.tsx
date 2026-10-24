@@ -16,7 +16,7 @@ import {
   MonitorX,
   WifiOff,
   History,
-} from "lucide-react";
+} from "@/components/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { LiquidGlassCard } from "@/components/LiquidGlassCard";

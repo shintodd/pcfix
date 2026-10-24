@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Wrench, ShieldAlert, Zap } from "lucide-react";
+import { X, Wrench, ShieldAlert, Zap } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface PinDetail {

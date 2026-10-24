@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { AlertTriangle, RotateCcw, Home, Wrench } from "lucide-react";
+import { AlertTriangle, RotateCcw, Home, Wrench } from "@/components/icons";
 
 export default function ErrorBoundary({
   error,

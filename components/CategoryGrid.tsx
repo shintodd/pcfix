@@ -12,7 +12,7 @@ import {
   HelpCircle,
   type LucideIcon,
   BookOpen,
-} from "lucide-react";
+} from "@/components/icons";
 import { CATEGORIES, type Severity } from "@/lib/categories";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n/LanguageContext";

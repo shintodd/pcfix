@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Terminal } from "lucide-react";
+import { ArrowRight, Terminal } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import QuickTipsFeed from "@/components/QuickTipsFeed";
 import { TIPS_DATA } from "@/lib/tips-data";

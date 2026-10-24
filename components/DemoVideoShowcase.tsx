@@ -11,7 +11,7 @@ import {
   Flame,
   Cpu,
   Terminal,
-} from "lucide-react";
+} from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function DemoVideoShowcase() {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Volume2, Lightbulb, Play, Square, Check, AlertCircle, Wrench, Camera } from "lucide-react";
+import { X, Volume2, Lightbulb, Play, Square, Check, AlertCircle, Wrench, Camera } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface BeepPattern {

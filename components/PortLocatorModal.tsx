@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, CheckCircle2, AlertTriangle, Monitor, Zap, Cable, Check, HelpCircle, Camera } from "lucide-react";
+import { X, CheckCircle2, AlertTriangle, Monitor, Zap, Cable, Check, HelpCircle, Camera } from "@/components/icons";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function PortLocatorModal({

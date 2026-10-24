@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
   HelpCircle,
-} from "lucide-react";
+} from "@/components/icons";
 import {
   WIZARD_TREE,
   type WizardOption,

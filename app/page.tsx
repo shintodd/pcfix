@@ -7,7 +7,7 @@ import {
   Wrench,
   Layers,
   ArrowRight,
-} from "lucide-react";
+} from "@/components/icons";
 import HeroScan from "@/components/HeroScan";
 import CategoryGrid from "@/components/CategoryGrid";
 import HeroInput from "@/components/HeroInput";

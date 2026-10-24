@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Smartphone, Copy, Check, QrCode } from "lucide-react";
+import { X, Smartphone, Copy, Check, QrCode } from "@/components/icons";
 import QRCode from "qrcode";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
